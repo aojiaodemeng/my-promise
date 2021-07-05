@@ -1,16 +1,19 @@
 const MyPromise = require("./myPromise");
 let promise = new MyPromise((resolve, reject) => {
-  setTimeout(() => {
-    // resolve('成功')
-    reject("失败");
-  }, 2000);
+  resolve("成功");
 });
 
-promise.then(
-  (value) => {
+function other() {
+  return new MyPromise((resolve, reject) => {
+    resolve("other");
+  });
+}
+promise
+  .then((value) => {
     console.log(value);
-  },
-  (reason) => {
-    console.log(reason);
-  }
-);
+    // return 100
+    return other();
+  })
+  .then((value) => {
+    console.log(value);
+  });
