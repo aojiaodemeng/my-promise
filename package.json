@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/aojiaodemeng/my-promise/issues"
   },
-  "homepage": "https://github.com/aojiaodemeng/my-promise#readme"
+  "homepage": "https://github.com/aojiaodemeng/my-promise#readme",
+  "dependencies": {
+    "nodemon": "^2.0.9"
+  }
 }

@@ -9,19 +9,26 @@
   <body>
     <script>
       var promise = new Promise(function (resolve, reject) {
-        resolve(100);
+        reject("ss");
       });
+      promise
+        .then()
+        .then()
+        .then(
+          (value) => console.log(value),
+          (reason) => console.log(reason)
+        );
 
-      var p1 = promise.then(function (value) {
-        console.log(value);
-        return p1;
-      });
-      p1.then(
-        function () {},
-        function (reason) {
-          console.log(reason.message);
-        }
-      );
+      // var p1 = promise.then(function (value) {
+      //   console.log(value);
+      //   return p1;
+      // });
+      // p1.then(
+      //   function () {},
+      //   function (reason) {
+      //     console.log(reason.message);
+      //   }
+      // );
     </script>
   </body>
 </html>

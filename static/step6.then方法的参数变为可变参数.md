@@ -1,3 +1,4 @@
+```javascript
 const PENDING = "pending";
 const FULFILLED = "fulfilled";
 const REJECTED = "rejected";
@@ -38,12 +39,8 @@ class MyPromise {
     while (this.failCallback.length) this.failCallback.shift()(this.reason);
   };
   then(successCallback, failCallback) {
-    successCallback = successCallback ? successCallback : (value) => value;
-    failCallback = failCallback
-      ? failCallback
-      : (reason) => {
-          throw reason;
-        };
++   successCallback = successCallback ? successCallback : (value) => value;
++   failCallback = failCallback ? failCallback : (reason) => { throw reason; };
     let promise2 = new MyPromise((resolve, reject) => {
       if (this.status === FULFILLED) {
         setTimeout(() => {
@@ -88,3 +85,21 @@ function resolvePromise(promise2, x, resolve, reject) {
   }
 }
 module.exports = MyPromise;
+```
+
+```javascript
+const MyPromise = require("./myPromise");
+let promise = new MyPromise((resolve, reject) => {
+  resolve("成功");
+});
+
+promise
+  .then()
+  .then()
+  .then(
+    (value) => {
+      console.log(value);
+    },
+    (reason) => console.log(reason)
+  );
+```
