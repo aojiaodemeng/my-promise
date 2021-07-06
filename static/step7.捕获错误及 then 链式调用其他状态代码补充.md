@@ -1,3 +1,93 @@
+# 一、简述
+
+思路：需要在执行构造器以及执行回调函数时捕获错误。
+
+# 二、在执行构造器捕获错误
+
+```javascript
+class MyPromise {
+  constructor(executor) {
++   try {
+      executor(this.resolve, this.reject);
++   } catch (e) {
++     this.reject(e);
++   }
+  }
+}
+```
+
+# 三、执行回调函数时捕获错误
+
+```javascript
+class MyPromise {
+    resolve = (value) => {
+        ...
+-       while (this.successCallback.length) this.successCallback.shift()(this.value);
++       while (this.successCallback.length) this.successCallback.shift()();
+    };
+    reject = (value) => {
+        ...
+-       while (this.failCallback.length) this.failCallback.shift()(this.reason);
++       while (this.failCallback.length) this.failCallback.shift()();
+    };
+    then(successCallback, failCallback) {
+        ...
+        let promise2 = new MyPromise((resolve, reject) => {
+        if (this.status === FULFILLED) {
+            setTimeout(() => {
++              try {
+                    let x = successCallback(this.value);
+                    resolvePromise(promise2, x, resolve, reject);
++              } catch (e) {
++                  reject(e);
++              }
+            }, 0);
+        } else if (this.status === REJECTED) {
+-           failCallback(this.reason)
++           setTimeout(() => {
++               try {
++                   let x = failCallback(this.reason);
++                   resolvePromise(promise2, x, resolve, reject);
++               } catch (e) {
++                   reject(e);
++               }
++           }, 0);
+        } else {
+            // 等待
+            // 将成功回调和失败回调存储
+-           this.successCallback.push(successCallback)
+-           this.failCallback.push(failCallback)
++           this.successCallback.push(() => {
+                setTimeout(() => {
+                    try {
+                        let x = successCallback(this.value);
+                        resolvePromise(promise2, x, resolve, reject);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }, 0);
+            });
++           this.failCallback.push(() => {
+                setTimeout(() => {
+                    try {
+                        let x = failCallback(this.reason);
+                        resolvePromise(promise2, x, resolve, reject);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }, 0);
+            });
+        }
+    });
+    return promise2;
+  }
+}
+```
+
+# 四、完整的类 promise
+
+```javascript
+// myPromise.js
 const PENDING = "pending";
 const FULFILLED = "fulfilled";
 const REJECTED = "rejected";
@@ -113,3 +203,4 @@ function resolvePromise(promise2, x, resolve, reject) {
   }
 }
 module.exports = MyPromise;
+```
