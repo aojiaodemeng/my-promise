@@ -13,6 +13,5 @@ function p2() {
   });
 }
 
-MyPromise.all(["a", "b", p1(), p2(), "c"]).then((result) =>
-  console.log(result)
-);
+MyPromise.resolve("100").then((result) => console.log(result));
+MyPromise.resolve(p2()).then((result) => console.log(result));
