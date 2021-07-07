@@ -9,9 +9,20 @@ function p1() {
 }
 function p2() {
   return new MyPromise(function (resolve, reject) {
-    resolve("p2");
+    resolve("p2 resolve");
   });
 }
 
-MyPromise.resolve("100").then((result) => console.log(result));
-MyPromise.resolve(p2()).then((result) => console.log(result));
+p2()
+  .finally(() => {
+    console.log("finally");
+    return p1();
+  })
+  .then(
+    (value) => {
+      console.log("then:" + value);
+    },
+    (reason) => {
+      console.log(reason);
+    }
+  );
