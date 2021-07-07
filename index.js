@@ -1,12 +1,18 @@
 const MyPromise = require("./myPromise");
-let promise = new MyPromise((resolve, reject) => {
-  // throw new Error("execu");
-  resolve("成功");
-});
 
-promise
-  .then()
-  .then()
-  .then((value) => {
-    console.log("then2", value);
+function p1() {
+  return new MyPromise(function (resolve, reject) {
+    setTimeout(function () {
+      resolve("p1");
+    }, 2000);
   });
+}
+function p2() {
+  return new MyPromise(function (resolve, reject) {
+    resolve("p2");
+  });
+}
+
+MyPromise.all(["a", "b", p1(), p2(), "c"]).then((result) =>
+  console.log(result)
+);

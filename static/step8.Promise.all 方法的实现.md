@@ -1,3 +1,76 @@
+# 一、实现思路
+
+首先，all 方法的调用是 Promise.all()，即类 Promise 中的一个静态方法。此方法接受一个数组，在循环这个数组时，需要判断该元素是普通值还是 promise 对象。如果是普通值，就直接放入结果数组中，如果是 promise 对象，就先去执行这个 promise 对象，再把执行结果放入结果数组中。
+
+注意事项：需要考虑传入的 promise 对象里有异步代码的情况
+
+# 二、踩坑记录
+
+```javascript
+  static all(array) {
+    let result = [];
+    function addData(key, value) {
+      result[key] = value;
+    }
+    return new MyPromise((resolve, reject) => {
+      for (let i = 0; i < array.length; i++) {
+        let current = array[i];
+        if (current instanceof MyPromise) {
+          // promise对象
+          current.then(
+            (value) => addData(i, value),
+            (reason) => reject(reason)
+          );
+        } else {
+          // 普通值
+          addData(i, array[i]);
+        }
+      }
+      resolve(result);
+    });
+  }
+```
+
+调试结果如下图所示，p1 方法中因为有异步代码，因此在异步代码未执行完成就赋值了结果数组，导致输出的值是个空值。
+
+<img src="./3.jpg"/>
+
+更改代码如下图，resolve(result)放到 addData 方法里执行，由于 addData 方法要用到 resolve 方法，所以需要移动到了 for 循环里。
+
+```javascript
+static all(array) {
+    let result = [];
+    let index = 0;
+
+    return new MyPromise((resolve, reject) => {
+      function addData(key, value) {
+        result[key] = value;
+        index++;
+        if (index === array.length) {
+          resolve(result);
+        }
+      }
+      for (let i = 0; i < array.length; i++) {
+        let current = array[i];
+        if (current instanceof MyPromise) {
+          // promise对象
+          current.then(
+            (value) => addData(i, value),
+            (reason) => reject(reason)
+          );
+        } else {
+          // 普通值
+          addData(i, array[i]);
+        }
+      }
+    });
+  }
+
+```
+
+# 三、完整的 类 MyPromise
+
+```javascript
 const PENDING = "pending";
 const FULFILLED = "fulfilled";
 const REJECTED = "rejected";
@@ -140,3 +213,4 @@ function resolvePromise(promise2, x, resolve, reject) {
   }
 }
 module.exports = MyPromise;
+```
