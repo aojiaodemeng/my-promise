@@ -1,3 +1,20 @@
+# 一、概述
+
+用来处理当前 promise 对象最终的失败回调函数。也可以在这个方法执行之后链式调用 then
+
+实现思路：在 catch 方法内部调用 then 方法，在调用 then 方法时的成功回调函数传入 undefined，在失败回调函数传入一个回调函数，就能执行 catch 方法中的失败回调。
+
+# 二、函数代码
+
+```javascript
+catch(failCallback) {
+    return this.then(undefined, failCallback);
+  }
+```
+
+# 三、完整的 类 MyPromise
+
+```javascript
 const PENDING = "pending";
 const FULFILLED = "fulfilled";
 const REJECTED = "rejected";
@@ -161,3 +178,4 @@ function resolvePromise(promise2, x, resolve, reject) {
   }
 }
 module.exports = MyPromise;
+```
